@@ -9,7 +9,7 @@ see the waste of empty space at the end of the buffer.
 
 | Before                       | After                       |
 |:----------------------------:|:---------------------------:|
-|<img src="./etc/before.gif"/> | <img src="./etc/after.gif"/>|
+|<img src="./etc/before.png"/> | <img src="./etc/after.png"/>|
 
 ## Usage
 
