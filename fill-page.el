@@ -1,10 +1,10 @@
-;;; fill-page.el --- Fill the buffer so you don't see empty lines at the end  -*- lexical-binding: t; -*-
+;;; fill-page.el --- Fill buffer so you don't see empty lines at the end  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Shen, Jen-Chieh
 ;; Created date 2020-08-16 18:37:21
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
-;; Description: Fill the buffer so you don't see empty lines at the end.
+;; Description: Fill buffer so you don't see empty lines at the end.
 ;; Keyword: fill page buffer
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "24.3"))
@@ -27,13 +27,13 @@
 
 ;;; Commentary:
 ;;
-;; Fill the buffer so you don't see empty lines at the end.
+;; Fill buffer so you don't see empty lines at the end.
 ;;
 
 ;;; Code:
 
 (defgroup fill-page nil
-  ""
+  "Fill buffer so you don't see empty lines at the end."
   :prefix "fill-page-"
   :group 'tool
   :link '(url-link :tag "Repository" "https://github.com/jcs-elpa/fill-page"))
