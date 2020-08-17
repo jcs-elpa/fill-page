@@ -94,7 +94,8 @@ will use the current buffer instead."
 
 (defun fill-page-update-info (&rest _)
   "Collect all necessary information to do fill page correctly."
-  (setq fill-page--window-height (fill-page--max-window-height)))
+  (when fill-page-mode
+    (setq fill-page--window-height (fill-page--max-window-height))))
 
 (defun fill-page--window-scroll-functions (&rest _)
   "For `fill-page' minor mode hook."
@@ -106,11 +107,13 @@ will use the current buffer instead."
 (defun fill-page--enable ()
   "Enable `fill-page' in current buffer."
   (fill-page-update-info)
+  (advice-add 'text-scale-increase :after #'fill-page-update-info)
   (add-hook 'window-configuration-change-hook #'fill-page-update-info nil t)
   (add-hook 'window-scroll-functions #'fill-page--window-scroll-functions nil t))
 
 (defun fill-page--disable ()
   "Disable `fill-page' in current buffer."
+  (advice-remove 'text-scale-increase #'fill-page-update-info)
   (remove-hook 'window-configuration-change-hook #'fill-page-update-info t)
   (remove-hook 'window-scroll-functions #'fill-page--window-scroll-functions t))
 
