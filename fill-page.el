@@ -41,9 +41,6 @@
 (defvar-local fill-page--window-height -1
   "Record of the window height.")
 
-(defvar-local fill-page--active-buffer nil
-  "")
-
 ;;; Util
 
 (defun fill-page--first-display-line ()
@@ -59,8 +56,7 @@
 (defun fill-page--initialized-p ()
   "Return non-nil if fill page information got filled correctly.
 Return nil means you need to call `fill-page-update-info'."
-  (and (not (null fill-page--active-buffer))
-       (not (<= fill-page--window-height -1))))
+  (not (<= fill-page--window-height -1)))
 
 (defun fill-page--max-window-height ()
   "Get possible window height by line height."
@@ -98,12 +94,12 @@ will use the current buffer instead."
 
 (defun fill-page-update-info (&rest _)
   "Collect all necessary information to do fill page correctly."
-  (setq fill-page--active-buffer (current-buffer))
   (setq fill-page--window-height (fill-page--max-window-height)))
 
 (defun fill-page--window-scroll-functions (&rest _)
   "For `fill-page' minor mode hook."
-  (unless (fill-page-fill-p) (fill-page)))
+  (when (equal (get-buffer-window) (selected-window))
+    (unless (fill-page-fill-p) (fill-page))))
 
 ;;; Entry
 
@@ -115,7 +111,6 @@ will use the current buffer instead."
 
 (defun fill-page--disable ()
   "Disable `fill-page' in current buffer."
-  (setq fill-page--active-buffer nil)
   (remove-hook 'window-configuration-change-hook #'fill-page-update-info t)
   (remove-hook 'window-scroll-functions #'fill-page--window-scroll-functions t))
 
