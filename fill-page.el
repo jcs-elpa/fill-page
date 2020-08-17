@@ -7,7 +7,7 @@
 ;; Description: Fill buffer so you don't see empty lines at the end.
 ;; Keyword: fill page buffer
 ;; Version: 0.1.1
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.4"))
 ;; URL: https://github.com/jcs-elpa/fill-page
 
 ;; This file is NOT part of GNU Emacs.
@@ -40,6 +40,37 @@
 
 (defvar-local fill-page--window-height -1
   "Record of the window height.")
+
+;;; Entry
+
+(defun fill-page--enable ()
+  "Enable `fill-page' in current buffer."
+  (fill-page-update-info)
+  (advice-add 'text-scale-increase :after #'fill-page-update-info)
+  (add-hook 'window-configuration-change-hook #'fill-page-update-info nil t)
+  (add-hook 'window-scroll-functions #'fill-page--window-scroll-functions nil t))
+
+(defun fill-page--disable ()
+  "Disable `fill-page' in current buffer."
+  (advice-remove 'text-scale-increase #'fill-page-update-info)
+  (remove-hook 'window-configuration-change-hook #'fill-page-update-info t)
+  (remove-hook 'window-scroll-functions #'fill-page--window-scroll-functions t))
+
+;;;###autoload
+(define-minor-mode fill-page-mode
+  "Minor mode 'fill-page-mode'."
+  :lighter " F-Pg"
+  :group fill-page
+  (if fill-page-mode (fill-page--enable) (fill-page--disable)))
+
+(defun fill-page--turn-on-fill-page-mode ()
+  "Turn on the 'fill-page-mode'."
+  (fill-page-mode 1))
+
+;;;###autoload
+(define-globalized-minor-mode global-fill-page-mode
+  fill-page-mode fill-page--turn-on-fill-page-mode
+  :require 'fill-page)
 
 ;;; Util
 
@@ -101,37 +132,6 @@ will use the current buffer instead."
   "For `fill-page' minor mode hook."
   (when (equal (get-buffer-window) (selected-window))
     (unless (fill-page-fill-p) (fill-page))))
-
-;;; Entry
-
-(defun fill-page--enable ()
-  "Enable `fill-page' in current buffer."
-  (fill-page-update-info)
-  (advice-add 'text-scale-increase :after #'fill-page-update-info)
-  (add-hook 'window-configuration-change-hook #'fill-page-update-info nil t)
-  (add-hook 'window-scroll-functions #'fill-page--window-scroll-functions nil t))
-
-(defun fill-page--disable ()
-  "Disable `fill-page' in current buffer."
-  (advice-remove 'text-scale-increase #'fill-page-update-info)
-  (remove-hook 'window-configuration-change-hook #'fill-page-update-info t)
-  (remove-hook 'window-scroll-functions #'fill-page--window-scroll-functions t))
-
-;;;###autoload
-(define-minor-mode fill-page-mode
-  "Minor mode 'fill-page-mode'."
-  :lighter " F-Pg"
-  :group fill-page
-  (if fill-page-mode (fill-page--enable) (fill-page--disable)))
-
-(defun fill-page--turn-on-fill-page-mode ()
-  "Turn on the 'fill-page-mode'."
-  (fill-page-mode 1))
-
-;;;###autoload
-(define-globalized-minor-mode global-fill-page-mode
-  fill-page-mode fill-page--turn-on-fill-page-mode
-  :require 'fill-page)
 
 (provide 'fill-page)
 ;;; fill-page.el ends here
