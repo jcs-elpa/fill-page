@@ -38,6 +38,12 @@
   :group 'tool
   :link '(url-link :tag "Repository" "https://github.com/jcs-elpa/fill-page"))
 
+(defvar-local fill-page--window-height -1
+  "Record of the window height.")
+
+(defvar-local fill-page--active-buffer nil
+  "")
+
 ;;; Util
 
 (defun fill-page--first-display-line ()
@@ -48,11 +54,13 @@
   "Return the last display line number."
   (save-excursion (move-to-window-line -1) (line-number-at-pos nil t)))
 
-(defun fill-page--recenter-positions (type)
-  "Return the recenter position value by TYPE."
-  (cl-case type (top '(top)) (middle '(middle)) (bottom '(bottom))))
-
 ;;; Core
+
+(defun fill-page--initialized-p ()
+  "Return non-nil if fill page information got filled correctly.
+Return nil means you need to call `fill-page-update-info'."
+  (and (not (null fill-page--active-buffer))
+       (not (<= fill-page--window-height -1))))
 
 (defun fill-page--max-window-height ()
   "Get possible window height by line height."
@@ -70,11 +78,11 @@ The optional argument BUFFER-OR-NAME must be a string or buffer.  Or else
 will use the current buffer instead."
   (unless buffer-or-name (setq buffer-or-name (current-buffer)))
   (with-current-buffer buffer-or-name
+    (unless (fill-page--initialized-p) (fill-page-update-info))
     (let* ((first-ln (fill-page--first-display-line))
            (last-ln (fill-page--last-display-line))
-           (con-h (- last-ln first-ln))
-           (win-h (fill-page--max-window-height)))
-      (<= win-h con-h))))
+           (con-h (- last-ln first-ln)))
+      (<= fill-page--window-height con-h))))
 
 ;;;###autoload
 (defun fill-page (&optional buffer-or-name)
@@ -88,7 +96,12 @@ will use the current buffer instead."
       (goto-char (point-max))
       (recenter -1))))
 
-(defun fill-page--post-command-hook ()
+(defun fill-page-update-info (&rest _)
+  "Collect all necessary information to do fill page correctly."
+  (setq fill-page--active-buffer (current-buffer))
+  (setq fill-page--window-height (fill-page--max-window-height)))
+
+(defun fill-page--window-scroll-functions (&rest _)
   "For `fill-page' minor mode hook."
   (unless (fill-page-fill-p) (fill-page)))
 
@@ -96,11 +109,15 @@ will use the current buffer instead."
 
 (defun fill-page--enable ()
   "Enable `fill-page' in current buffer."
-  (add-hook 'post-command-hook #'fill-page--post-command-hook nil t))
+  (fill-page-update-info)
+  (add-hook 'window-configuration-change-hook #'fill-page-update-info nil t)
+  (add-hook 'window-scroll-functions #'fill-page--window-scroll-functions nil t))
 
 (defun fill-page--disable ()
   "Disable `fill-page' in current buffer."
-  (remove-hook 'post-command-hook #'fill-page--post-command-hook t))
+  (setq fill-page--active-buffer nil)
+  (remove-hook 'window-configuration-change-hook #'fill-page-update-info t)
+  (remove-hook 'window-scroll-functions #'fill-page--window-scroll-functions t))
 
 ;;;###autoload
 (define-minor-mode fill-page-mode
