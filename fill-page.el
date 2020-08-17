@@ -52,11 +52,6 @@
   "Return the recenter position value by TYPE."
   (cl-case type (top '(top)) (middle '(middle)) (bottom '(bottom))))
 
-(defun fill-page--recenter-top-bottom (type)
-  "Recenter the window by TYPE."
-  (let ((recenter-positions (fill-page--recenter-positions type)))
-    (recenter-top-bottom)))
-
 ;;; Core
 
 (defun fill-page--max-window-height ()
@@ -64,7 +59,7 @@
   (save-excursion
     (save-window-excursion
       (goto-char (point-min))
-      (fill-page--recenter-top-bottom 'top)  ; For redisplay
+      (recenter 1)
       (- (fill-page--last-display-line) (fill-page--first-display-line)))))
 
 (defun fill-page-fill-p (&optional buffer-or-name)
@@ -91,7 +86,7 @@ will use the current buffer instead."
   (with-current-buffer buffer-or-name
     (save-excursion
       (goto-char (point-max))
-      (fill-page--recenter-top-bottom 'bottom))))
+      (recenter -1))))
 
 (defun fill-page--post-command-hook ()
   "For `fill-page' minor mode hook."
