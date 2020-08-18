@@ -130,7 +130,8 @@ will use the current buffer instead."
 
 (defun fill-page--window-scroll-functions (&rest _)
   "For `fill-page' minor mode hook."
-  (when (equal (get-buffer-window) (selected-window))
+  (save-selected-window
+    (select-window (get-buffer-window))
     (unless (fill-page-fill-p) (fill-page))))
 
 (provide 'fill-page)
