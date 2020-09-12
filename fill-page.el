@@ -91,11 +91,12 @@ Return nil means you need to call `fill-page-update-info'."
 
 (defun fill-page--max-window-height ()
   "Get possible window height by line height."
-  (save-excursion
+  (when (window-buffer)
+    (save-excursion
     (save-window-excursion
       (goto-char (point-min))
       (recenter 1)
-      (- (fill-page--last-display-line) (fill-page--first-display-line)))))
+      (- (fill-page--last-display-line) (fill-page--first-display-line))))))
 
 (defun fill-page-fill-p (&optional buffer-or-name)
   "Return non-nil, if the page are already filled.
@@ -117,11 +118,12 @@ will use the current buffer instead."
 
 The optional argument BUFFER-OR-NAME must be a string or buffer.  Or else
 will use the current buffer instead."
-  (unless buffer-or-name (setq buffer-or-name (current-buffer)))
-  (with-current-buffer buffer-or-name
-    (save-excursion
-      (goto-char (point-max))
-      (recenter -1))))
+  (unless buffer-or-name (setq buffer-or-name (window-buffer)))
+  (when buffer-or-name
+    (with-current-buffer buffer-or-name
+      (save-excursion
+        (goto-char (point-max))
+        (recenter -1)))))
 
 (defun fill-page-update-info (&rest _)
   "Collect all necessary information to do fill page correctly."
