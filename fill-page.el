@@ -87,7 +87,8 @@
 (defun fill-page--initialized-p ()
   "Return non-nil if fill page information got filled correctly.
 Return nil means you need to call `fill-page-update-info'."
-  (not (<= fill-page--window-height -1)))
+  (and (numberp fill-page--window-height)
+       (not (<= fill-page--window-height -1))))
 
 (defun fill-page--max-window-height ()
   "Get possible window height by line height."
@@ -126,7 +127,7 @@ will use the current buffer instead."
 (defun fill-page-update-info (&rest _)
   "Collect all necessary information to do fill page correctly."
   (when fill-page-mode
-    (setq fill-page--window-height (fill-page--max-window-height))))
+    (setq fill-page--window-height (ignore-errors (fill-page--max-window-height)))))
 
 (defun fill-page--window-scroll-functions (&rest _)
   "For `fill-page' minor mode hook."
