@@ -41,20 +41,25 @@
 (defvar-local fill-page--window-height -1
   "Record of the window height.")
 
+(defvar-local fill-page--max-line -1
+  "Record of the total line.")
+
 ;;; Entry
 
 (defun fill-page--enable ()
   "Enable `fill-page' in current buffer."
   (fill-page-update-info)
   (advice-add 'text-scale-increase :after #'fill-page-update-info)
+  (add-hook 'after-change-functions #'fill-page--after-change-functions nil t)
   (add-hook 'window-configuration-change-hook #'fill-page-update-info nil t)
-  (add-hook 'window-scroll-functions #'fill-page--window-scroll-functions nil t))
+  (add-hook 'window-scroll-functions #'fill-page--do-fill-page nil t))
 
 (defun fill-page--disable ()
   "Disable `fill-page' in current buffer."
   (advice-remove 'text-scale-increase #'fill-page-update-info)
+  (remove-hook 'after-change-functions #'fill-page--after-change-functions t)
   (remove-hook 'window-configuration-change-hook #'fill-page-update-info t)
-  (remove-hook 'window-scroll-functions #'fill-page--window-scroll-functions t))
+  (remove-hook 'window-scroll-functions #'fill-page--do-fill-page t))
 
 ;;;###autoload
 (define-minor-mode fill-page-mode
@@ -129,14 +134,23 @@ will use the current buffer instead."
   (when fill-page-mode
     (setq fill-page--window-height (ignore-errors (fill-page--max-window-height)))))
 
-(defun fill-page--window-scroll-functions (&rest _)
-  "For `fill-page' minor mode hook."
+(defun fill-page--do-fill-page (&rest _)
+  "Do the fill page once."
   (let ((win-lst (get-buffer-window-list)))
     (when (and (window-live-p (selected-window)) win-lst)
       (save-selected-window
         (dolist (win win-lst)
           (select-window win)
           (unless (fill-page-fill-p) (fill-page)))))))
+
+;;; Registry
+
+(defun fill-page--after-change-functions (&rest _)
+  "For `fill-page' after change."
+  (let ((max-ln (line-number-at-pos (point-max) t)))
+    (unless (= max-ln fill-page--max-line)
+      (setq fill-page--max-line max-ln)
+      (fill-page--do-fill-page))))
 
 (provide 'fill-page)
 ;;; fill-page.el ends here
