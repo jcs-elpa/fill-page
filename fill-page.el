@@ -44,9 +44,6 @@
 (defvar-local fill-page--max-line -1
   "Record of the total line.")
 
-(defvar fill-page--last-input-event -1
-  "Record of `last-input-event'.")
-
 ;;; Entry
 
 (defun fill-page--enable ()
@@ -148,14 +145,14 @@ will use the current buffer instead."
 
 ;;; Registry
 
-(defun fill-page--after-change-functions (&rest _)
-  "For `fill-page' after change."
-  (unless (eq fill-page--last-input-event last-input-event)
-    (let ((max-ln (line-number-at-pos (point-max) t)))
+(defun fill-page--after-change-functions (beg end len)
+  "For `fill-page' after change, BEG, END and LEN."
+  (let ((adding-p (<= (+ beg len) end)) max-ln)
+    (unless adding-p
+      (setq max-ln (line-number-at-pos (point-max) t))
       (unless (= max-ln fill-page--max-line)
         (setq fill-page--max-line max-ln)
-        (fill-page--do-fill-page)))
-    (setq fill-page--last-input-event last-input-event)))
+        (fill-page--do-fill-page)))))
 
 (provide 'fill-page)
 ;;; fill-page.el ends here
