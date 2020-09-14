@@ -39,10 +39,16 @@
   :link '(url-link :tag "Repository" "https://github.com/jcs-elpa/fill-page"))
 
 (defvar-local fill-page--window-height -1
-  "Record of the window height.")
+  "Real display window height.")
 
 (defvar-local fill-page--max-line -1
   "Record of the total line.")
+
+(defvar-local fill-page--record-window-width -1
+  "Record of the window window.")
+
+(defvar-local fill-page--record-window-height -1
+  "Record of the window height.")
 
 ;;; Entry
 
@@ -100,7 +106,7 @@ Return nil means you need to call `fill-page-update-info'."
   (save-excursion
     (save-window-excursion
       (goto-char (point-min))
-      (recenter 1)
+      (recenter)
       (- (fill-page--last-display-line) (fill-page--first-display-line)))))
 
 (defun fill-page-fill-p (&optional buffer-or-name)
@@ -115,7 +121,8 @@ will use the current buffer instead."
     (let* ((first-ln (fill-page--first-display-line))
            (last-ln (fill-page--last-display-line))
            (con-h (- last-ln first-ln)))
-      (<= fill-page--window-height con-h))))
+      (and fill-page--window-height
+           (<= fill-page--window-height con-h)))))
 
 ;;;###autoload
 (defun fill-page (&optional buffer-or-name)
@@ -132,12 +139,19 @@ will use the current buffer instead."
 (defun fill-page-update-info (&rest _)
   "Collect all necessary information to do fill page correctly."
   (when fill-page-mode
-    (setq fill-page--window-height (ignore-errors (fill-page--max-window-height)))))
+    (when (or (not fill-page--window-height)
+              (not (= (window-width) fill-page--record-window-width))
+              (not (= (window-height) fill-page--record-window-height)))
+      (setq fill-page--record-window-width (window-width))
+      (setq fill-page--record-window-height (window-height))
+      (setq fill-page--window-height
+            (ignore-errors (fill-page--max-window-height))))))
 
 (defun fill-page--do-fill-page (&rest _)
   "Do the fill page once."
   (let ((win-lst (get-buffer-window-list)))
     (when (and (window-live-p (selected-window)) win-lst)
+      (setq fill-page--max-line (line-number-at-pos (point-max) t))
       (save-selected-window
         (dolist (win win-lst)
           (select-window win)
