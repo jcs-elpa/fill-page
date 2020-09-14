@@ -147,12 +147,13 @@ will use the current buffer instead."
 
 (defun fill-page--after-change-functions (beg end len)
   "For `fill-page' after change, BEG, END and LEN."
-  (let ((adding-p (<= (+ beg len) end)) max-ln)
-    (unless adding-p
-      (setq max-ln (line-number-at-pos (point-max) t))
-      (unless (= max-ln fill-page--max-line)
-        (setq fill-page--max-line max-ln)
-        (fill-page--do-fill-page)))))
+  (when (get-buffer-window)
+    (let ((adding-p (<= (+ beg len) end)) max-ln)
+      (unless adding-p
+        (setq max-ln (line-number-at-pos (point-max) t))
+        (unless (= max-ln fill-page--max-line)
+          (setq fill-page--max-line max-ln)
+          (fill-page--do-fill-page))))))
 
 (provide 'fill-page)
 ;;; fill-page.el ends here
