@@ -122,6 +122,10 @@ will use the current buffer instead."
     (let* ((first-ln (fill-page--first-display-line))
            (last-ln (fill-page--last-display-line))
            (con-h (- last-ln first-ln)))
+      (message "fill-page--window-height: %s" fill-page--window-height)
+      (message "first-ln: %s" first-ln)
+      (message "last-ln: %s" last-ln)
+      (message "con-h: %s" con-h)
       (and fill-page--window-height
            (<= fill-page--window-height con-h)))))
 
