@@ -46,12 +46,6 @@
 (defvar-local fill-page--max-line -1
   "Record of the total line.")
 
-(defvar-local fill-page--record-window-width -1
-  "Record of the window window.")
-
-(defvar-local fill-page--record-window-height -1
-  "Record of the window height.")
-
 (defvar fill-page--show-debug-message nil
   "Log out detail information.")
 
@@ -62,12 +56,14 @@
   (fill-page--update-max-line)
   (advice-add 'text-scale-increase :after #'fill-page-update-info)
   (add-hook 'after-change-functions #'fill-page--after-change-functions nil t)
+  (add-hook 'window-configuration-change-hook #'fill-page--do-fill-page nil t)
   (add-hook 'window-scroll-functions #'fill-page--do-fill-page nil t))
 
 (defun fill-page--disable ()
   "Disable `fill-page' in current buffer."
   (advice-remove 'text-scale-increase #'fill-page-update-info)
   (remove-hook 'after-change-functions #'fill-page--after-change-functions t)
+  (remove-hook 'window-configuration-change-hook #'fill-page--do-fill-page t)
   (remove-hook 'window-scroll-functions #'fill-page--do-fill-page t))
 
 ;;;###autoload
@@ -130,8 +126,10 @@ will use the current buffer instead."
         (fill-page--debug-message "first-ln: %s" first-ln)
         (fill-page--debug-message "last-ln: %s" last-ln)
         (fill-page--debug-message "get-window-height: %s" (fill-page--get-window-height))
-        (fill-page--debug-message "con-h: %s" con-h))
-      (<= (fill-page--get-window-height) con-h))))
+        (fill-page--debug-message "con-h: %s" con-h)
+        (fill-page--debug-message "fill-page--max-line: %s" fill-page--max-line))
+      (or (not (= last-ln fill-page--max-line))
+          (<= (fill-page--get-window-height) con-h)))))
 
 ;;;###autoload
 (defun fill-page (&optional buffer-or-name)
