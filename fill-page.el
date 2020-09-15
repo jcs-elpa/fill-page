@@ -160,8 +160,9 @@ will use the current buffer instead."
       (fill-page--update-max-line)
       (save-selected-window
         (dolist (win win-lst)
-          (message "is this. %s" (current-buffer))
           (select-window win)
+          (message "\f")
+          (message "is this. %s" (current-buffer))
           (unless (fill-page-fill-p) (fill-page)))))))
 
 ;;; Registry
@@ -173,7 +174,6 @@ will use the current buffer instead."
       (unless adding-p
         (setq max-ln (line-number-at-pos (point-max) t))
         (unless (= max-ln fill-page--max-line)
-          (message "added by this.")
           (fill-page--update-max-line max-ln)
           ;;(fill-page--do-fill-page)
           )))))
