@@ -32,6 +32,8 @@
 
 ;;; Code:
 
+(require 'face-remap)
+
 (defgroup fill-page nil
   "Fill buffer so you don't see empty lines at the end."
   :prefix "fill-page-"
@@ -50,22 +52,22 @@
 (defvar-local fill-page--record-window-height -1
   "Record of the window height.")
 
+(defvar fill-page--show-debug-message nil
+  "Log out detail information.")
+
 ;;; Entry
 
 (defun fill-page--enable ()
   "Enable `fill-page' in current buffer."
   (fill-page--update-max-line)
-  (fill-page-update-info)
   (advice-add 'text-scale-increase :after #'fill-page-update-info)
   (add-hook 'after-change-functions #'fill-page--after-change-functions nil t)
-  (add-hook 'window-configuration-change-hook #'fill-page-update-info nil t)
   (add-hook 'window-scroll-functions #'fill-page--do-fill-page nil t))
 
 (defun fill-page--disable ()
   "Disable `fill-page' in current buffer."
   (advice-remove 'text-scale-increase #'fill-page-update-info)
   (remove-hook 'after-change-functions #'fill-page--after-change-functions t)
-  (remove-hook 'window-configuration-change-hook #'fill-page-update-info t)
   (remove-hook 'window-scroll-functions #'fill-page--do-fill-page t))
 
 ;;;###autoload
@@ -86,6 +88,10 @@
 
 ;;; Util
 
+(defun fill-page--debug-message (fmt &rest args)
+  "Debug message like function `message' with same argument FMT and ARGS."
+  (when fill-page--show-debug-message (apply #'message fmt args)))
+
 (defun fill-page--first-display-line ()
   "Return the first display line number."
   (save-excursion (move-to-window-line 0) (line-number-at-pos nil t)))
@@ -96,11 +102,9 @@
 
 ;;; Core
 
-(defun fill-page--initialized-p ()
-  "Return non-nil if fill page information got filled correctly.
-Return nil means you need to call `fill-page-update-info'."
-  (and (numberp fill-page--window-height)
-       (not (<= fill-page--window-height -1))))
+(defun fill-page--get-window-height ()
+  "Get window height base on the possible outcome."
+  (if text-scale-mode fill-page--window-height (1- (window-body-height))))
 
 (defun fill-page--max-window-height ()
   "Get possible window height by line height."
@@ -118,16 +122,16 @@ The optional argument BUFFER-OR-NAME must be a string or buffer.  Or else
 will use the current buffer instead."
   (unless buffer-or-name (setq buffer-or-name (current-buffer)))
   (with-current-buffer buffer-or-name
-    (unless (fill-page--initialized-p) (fill-page-update-info))
     (let* ((first-ln (fill-page--first-display-line))
            (last-ln (fill-page--last-display-line))
            (con-h (- last-ln first-ln)))
-      (message "fill-page--window-height: %s" fill-page--window-height)
-      (message "first-ln: %s" first-ln)
-      (message "last-ln: %s" last-ln)
-      (message "con-h: %s" con-h)
-      (and fill-page--window-height
-           (<= fill-page--window-height con-h)))))
+      (progn  ; Debug Log
+        (fill-page--debug-message "\f")
+        (fill-page--debug-message "first-ln: %s" first-ln)
+        (fill-page--debug-message "last-ln: %s" last-ln)
+        (fill-page--debug-message "get-window-height: %s" (fill-page--get-window-height))
+        (fill-page--debug-message "con-h: %s" con-h))
+      (<= (fill-page--get-window-height) con-h))))
 
 ;;;###autoload
 (defun fill-page (&optional buffer-or-name)
@@ -142,20 +146,13 @@ will use the current buffer instead."
       (recenter -1))))
 
 (defun fill-page--update-max-line (&optional max-ln)
-  "Update MAX-LINE."
+  "Update MAX-LN."
   (unless max-ln (setq max-ln (line-number-at-pos (point-max) t)))
   (setq fill-page--max-line max-ln))
 
 (defun fill-page-update-info (&rest _)
   "Collect all necessary information to do fill page correctly."
-  (when fill-page-mode
-    (when (or (not fill-page--window-height)
-              (not (= (window-width) fill-page--record-window-width))
-              (not (= (window-height) fill-page--record-window-height)))
-      (setq fill-page--record-window-width (window-width))
-      (setq fill-page--record-window-height (window-height))
-      (setq fill-page--window-height
-            (ignore-errors (fill-page--max-window-height))))))
+  (setq fill-page--window-height (ignore-errors (fill-page--max-window-height))))
 
 (defun fill-page--do-fill-page (&rest _)
   "Do the fill page once."
@@ -165,9 +162,6 @@ will use the current buffer instead."
       (save-selected-window
         (dolist (win win-lst)
           (select-window win)
-          (message "\f")
-          (message "is this. %s" (current-buffer))
-          (message "ln pos: %s" (line-number-at-pos))
           (unless (fill-page-fill-p) (fill-page)))))))
 
 ;;; Registry
@@ -180,8 +174,7 @@ will use the current buffer instead."
         (setq max-ln (line-number-at-pos (point-max) t))
         (unless (= max-ln fill-page--max-line)
           (fill-page--update-max-line max-ln)
-          ;;(fill-page--do-fill-page)
-          )))))
+          (fill-page--do-fill-page))))))
 
 (provide 'fill-page)
 ;;; fill-page.el ends here
