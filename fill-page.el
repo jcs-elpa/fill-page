@@ -54,6 +54,7 @@
 
 (defun fill-page--enable ()
   "Enable `fill-page' in current buffer."
+  (fill-page--update-max-line)
   (fill-page-update-info)
   (advice-add 'text-scale-increase :after #'fill-page-update-info)
   (add-hook 'after-change-functions #'fill-page--after-change-functions nil t)
@@ -136,6 +137,11 @@ will use the current buffer instead."
       (goto-char (point-max))
       (recenter -1))))
 
+(defun fill-page--update-max-line (&optional max-ln)
+  "Update MAX-LINE."
+  (unless max-ln (setq max-ln (line-number-at-pos (point-max) t)))
+  (setq fill-page--max-line max-ln))
+
 (defun fill-page-update-info (&rest _)
   "Collect all necessary information to do fill page correctly."
   (when fill-page-mode
@@ -151,7 +157,7 @@ will use the current buffer instead."
   "Do the fill page once."
   (let ((win-lst (get-buffer-window-list)))
     (when (and (window-live-p (selected-window)) win-lst)
-      (setq fill-page--max-line (line-number-at-pos (point-max) t))
+      (fill-page--update-max-line)
       (save-selected-window
         (dolist (win win-lst)
           (select-window win)
@@ -166,7 +172,7 @@ will use the current buffer instead."
       (unless adding-p
         (setq max-ln (line-number-at-pos (point-max) t))
         (unless (= max-ln fill-page--max-line)
-          (setq fill-page--max-line max-ln)
+          (fill-page--update-max-line max-ln)
           (fill-page--do-fill-page))))))
 
 (provide 'fill-page)
