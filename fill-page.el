@@ -167,6 +167,7 @@ will use the current buffer instead."
           (select-window win)
           (message "\f")
           (message "is this. %s" (current-buffer))
+          (message "ln pos: %s" (line-number-at-pos))
           (unless (fill-page-fill-p) (fill-page)))))))
 
 ;;; Registry
