@@ -6,7 +6,7 @@
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; Description: Fill buffer so you don't see empty lines at the end.
 ;; Keyword: fill page buffer
-;; Version: 0.3.3
+;; Version: 0.3.4
 ;; Package-Requires: ((emacs "24.4"))
 ;; URL: https://github.com/jcs-elpa/fill-page
 
