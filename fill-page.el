@@ -152,6 +152,10 @@ will use the current buffer instead."
   "Collect all necessary information to do fill page correctly."
   (setq fill-page--window-height (ignore-errors (fill-page--max-window-height))))
 
+(defun fill-page-if-need-to ()
+  "Do fill page if needed to."
+  (unless (fill-page-fill-p) (fill-page)))
+
 (defun fill-page--do-fill-page (&rest _)
   "Do the fill page once."
   (let ((win-lst (get-buffer-window-list)))
@@ -160,7 +164,7 @@ will use the current buffer instead."
       (save-selected-window
         (dolist (win win-lst)
           (select-window win)
-          (unless (fill-page-fill-p) (fill-page)))))))
+          (fill-page-if-need-to))))))
 
 ;;; Registry
 
