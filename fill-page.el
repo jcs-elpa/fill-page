@@ -104,9 +104,9 @@
 
 (defun fill-page--max-window-height ()
   "Get possible window height by line height."
-  (save-excursion
-    (save-window-excursion
-      (goto-char (point-min))
+  (save-window-excursion
+    (goto-char (point-min))
+    (save-excursion
       (recenter)
       (- (fill-page--last-display-line) (fill-page--first-display-line)))))
 
