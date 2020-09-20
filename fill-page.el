@@ -40,8 +40,6 @@
   :group 'tool
   :link '(url-link :tag "Repository" "https://github.com/jcs-elpa/fill-page"))
 
-(defvar-local fill-page--window-height -1
-  "Real display window height.")
 
 (defvar-local fill-page--max-line -1
   "Record of the total line.")
@@ -54,14 +52,12 @@
 (defun fill-page--enable ()
   "Enable `fill-page' in current buffer."
   (fill-page--update-max-line)
-  (advice-add 'text-scale-increase :after #'fill-page-update-info)
   (add-hook 'after-change-functions #'fill-page--after-change-functions nil t)
   (add-hook 'window-configuration-change-hook #'fill-page--do-fill-page nil t)
   (add-hook 'window-scroll-functions #'fill-page--do-fill-page nil t))
 
 (defun fill-page--disable ()
   "Disable `fill-page' in current buffer."
-  (advice-remove 'text-scale-increase #'fill-page-update-info)
   (remove-hook 'after-change-functions #'fill-page--after-change-functions t)
   (remove-hook 'window-configuration-change-hook #'fill-page--do-fill-page t)
   (remove-hook 'window-scroll-functions #'fill-page--do-fill-page t))
@@ -96,11 +92,15 @@
   "Return the last display line number."
   (save-excursion (move-to-window-line -1) (line-number-at-pos nil t)))
 
-;;; Core
+(defun fill-page--window-height ()
+  "`line-spacing'-aware calculation of `window-height'."
+  (if (and (fboundp 'window-pixel-height)
+           (fboundp 'line-pixel-height)
+           (display-graphic-p))
+      (/ (window-pixel-height) (line-pixel-height))
+    (window-height)))
 
-(defun fill-page--get-window-height ()
-  "Get window height base on the possible outcome."
-  (if text-scale-mode fill-page--window-height (1- (window-body-height))))
+;;; Core
 
 (defun fill-page--max-window-height ()
   "Get possible window height by line height."
@@ -125,11 +125,11 @@ will use the current buffer instead."
         (fill-page--debug-message "\f")
         (fill-page--debug-message "first-ln: %s" first-ln)
         (fill-page--debug-message "last-ln: %s" last-ln)
-        (fill-page--debug-message "get-window-height: %s" (fill-page--get-window-height))
+        (fill-page--debug-message "get-window-height: %s" (fill-page--window-height))
         (fill-page--debug-message "con-h: %s" con-h)
         (fill-page--debug-message "fill-page--max-line: %s" fill-page--max-line))
       (or (not (= last-ln fill-page--max-line))
-          (<= (fill-page--get-window-height) con-h)))))
+          (<= (fill-page--window-height) con-h)))))
 
 ;;;###autoload
 (defun fill-page (&optional buffer-or-name)
@@ -147,10 +147,6 @@ will use the current buffer instead."
   "Update MAX-LN."
   (unless max-ln (setq max-ln (line-number-at-pos (point-max) t)))
   (setq fill-page--max-line max-ln))
-
-(defun fill-page-update-info (&rest _)
-  "Collect all necessary information to do fill page correctly."
-  (setq fill-page--window-height (ignore-errors (fill-page--max-window-height))))
 
 (defun fill-page-if-unfill ()
   "Do fill page if is unfill."
