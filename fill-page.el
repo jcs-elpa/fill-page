@@ -102,14 +102,6 @@
 
 ;;; Core
 
-(defun fill-page--max-window-height ()
-  "Get possible window height by line height."
-  (save-window-excursion
-    (goto-char (point-min))
-    (save-excursion
-      (recenter)
-      (- (fill-page--last-display-line) (fill-page--first-display-line)))))
-
 (defun fill-page-fill-p (&optional buffer-or-name)
   "Return non-nil, if the page are already filled.
 Return nil, if there are unnecessary lines showing at the end of buffer.
