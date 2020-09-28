@@ -110,18 +110,9 @@ The optional argument BUFFER-OR-NAME must be a string or buffer.  Or else
 will use the current buffer instead."
   (unless buffer-or-name (setq buffer-or-name (current-buffer)))
   (with-current-buffer buffer-or-name
-    (let* ((first-ln (fill-page--first-display-line))
-           (last-ln (fill-page--last-display-line))
-           (con-h (- last-ln first-ln)))
-      (progn  ; Debug Log
-        (fill-page--debug-message "\f")
-        (fill-page--debug-message "first-ln: %s" first-ln)
-        (fill-page--debug-message "last-ln: %s" last-ln)
-        (fill-page--debug-message "get-window-height: %s" (fill-page--window-height))
-        (fill-page--debug-message "con-h: %s" con-h)
-        (fill-page--debug-message "fill-page--max-line: %s" fill-page--max-line))
-      (or (not (= last-ln fill-page--max-line))
-          (<= (fill-page--window-height) con-h)))))
+    (let* ((available-lines (1- (fill-page--window-height)))
+           (full-lines (save-excursion (1+ (move-to-window-line -1)))))
+      (= 0 (- available-lines full-lines)))))
 
 ;;;###autoload
 (defun fill-page (&optional buffer-or-name)
