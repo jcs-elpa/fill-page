@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.com/jcs-elpa/fill-page.svg?branch=master)](https://travis-ci.com/jcs-elpa/fill-page)
+[![MELPA](https://melpa.org/packages/fill-page-badge.svg)](https://melpa.org/#/fill-page)
+[![MELPA Stable](https://stable.melpa.org/packages/fill-page-badge.svg)](https://stable.melpa.org/#/fill-page)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # fill-page
