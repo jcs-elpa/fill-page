@@ -102,6 +102,7 @@
 
 ;;; Core
 
+;;;###autoload
 (defun fill-page-fill-p (&optional buffer-or-name)
   "Return non-nil, if the page are already filled.
 Return nil, if there are unnecessary lines showing at the end of buffer.
