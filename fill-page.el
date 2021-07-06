@@ -132,6 +132,7 @@ will use the current buffer instead."
   (unless max-ln (setq max-ln (line-number-at-pos (point-max) t)))
   (setq fill-page--max-line max-ln))
 
+;;;###autoload
 (defun fill-page-if-unfill ()
   "Do fill page if is unfill."
   (unless (fill-page-fill-p) (fill-page)))
