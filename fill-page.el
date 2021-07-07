@@ -133,7 +133,7 @@ will use the current buffer instead."
   (setq fill-page--max-line max-ln))
 
 ;;;###autoload
-(defun fill-page-if-unfill ()
+(defun fill-page-if-unfil ()
   "Do fill page if it's unfill."
   (unless (fill-page-fill-p) (fill-page)))
 
@@ -145,7 +145,7 @@ will use the current buffer instead."
       (save-selected-window
         (dolist (win win-lst)
           (select-window win)
-          (fill-page-if-unfill))))))
+          (fill-page-if-unfil))))))
 
 ;;; Registry
 
