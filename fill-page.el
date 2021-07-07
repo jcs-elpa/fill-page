@@ -134,7 +134,7 @@ will use the current buffer instead."
 
 ;;;###autoload
 (defun fill-page-if-unfill ()
-  "Do fill page if is unfill."
+  "Do fill page if it's unfill."
   (unless (fill-page-fill-p) (fill-page)))
 
 (defun fill-page--do-fill-page (&rest _)
