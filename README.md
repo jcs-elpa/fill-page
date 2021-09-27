@@ -1,10 +1,11 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![MELPA](https://melpa.org/packages/fill-page-badge.svg)](https://melpa.org/#/fill-page)
 [![MELPA Stable](https://stable.melpa.org/packages/fill-page-badge.svg)](https://stable.melpa.org/#/fill-page)
-[![CI](https://github.com/jcs-elpa/fill-page/actions/workflows/test.yml/badge.svg)](https://github.com/jcs-elpa/fill-page/actions/workflows/test.yml)
 
 # fill-page
 > Fill buffer so you don't see empty lines at the end.
+
+[![CI](https://github.com/jcs-elpa/fill-page/actions/workflows/test.yml/badge.svg)](https://github.com/jcs-elpa/fill-page/actions/workflows/test.yml)
 
 Minor mode that scrolls the buffer to the bottom of window so you don't
 see the waste of empty space at the end of the buffer.
