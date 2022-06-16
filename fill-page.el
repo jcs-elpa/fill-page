@@ -4,11 +4,10 @@
 ;; Created date 2020-08-16 18:37:21
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
-;; Description: Fill buffer so you don't see empty lines at the end.
-;; Keyword: fill page buffer
+;; URL: https://github.com/jcs-elpa/fill-page
 ;; Version: 0.3.7
 ;; Package-Requires: ((emacs "24.4"))
-;; URL: https://github.com/jcs-elpa/fill-page
+;; Keywords: fill page buffer
 
 ;; This file is NOT part of GNU Emacs.
 
