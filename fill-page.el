@@ -7,7 +7,7 @@
 ;; URL: https://github.com/jcs-elpa/fill-page
 ;; Version: 0.3.7
 ;; Package-Requires: ((emacs "24.4"))
-;; Keywords: fill page buffer
+;; Keywords: convenience fill page buffer
 
 ;; This file is NOT part of GNU Emacs.
 
