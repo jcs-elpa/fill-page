@@ -3,7 +3,7 @@
          "Fill buffer so you don't see empty lines at the end")
 
 (website-url "https://github.com/jcs-elpa/fill-page")
-(keywords "fill" "page" "buffer")
+(keywords "convenience" "fill" "page" "buffer")
 
 (package-file "fill-page.el")
 
