@@ -52,24 +52,24 @@
   "Enable `fill-page' in current buffer."
   (fill-page--update-max-line)
   (add-hook 'after-change-functions #'fill-page--after-change-functions nil t)
-  (add-hook 'window-configuration-change-hook #'fill-page--do-fill-page nil t)
-  (add-hook 'window-scroll-functions #'fill-page--do-fill-page nil t))
+  (add-hook 'window-configuration-change-hook #'fill-page--do-fill-page)
+  (add-hook 'window-scroll-functions #'fill-page--do-fill-page))
 
 (defun fill-page--disable ()
   "Disable `fill-page' in current buffer."
   (remove-hook 'after-change-functions #'fill-page--after-change-functions t)
-  (remove-hook 'window-configuration-change-hook #'fill-page--do-fill-page t)
-  (remove-hook 'window-scroll-functions #'fill-page--do-fill-page t))
+  (remove-hook 'window-configuration-change-hook #'fill-page--do-fill-page)
+  (remove-hook 'window-scroll-functions #'fill-page--do-fill-page))
 
 ;;;###autoload
 (define-minor-mode fill-page-mode
-  "Minor mode 'fill-page-mode'."
+  "Minor mode `fill-page-mode'."
   :lighter " F-Pg"
   :group fill-page
   (if fill-page-mode (fill-page--enable) (fill-page--disable)))
 
 (defun fill-page--turn-on-fill-page-mode ()
-  "Turn on the 'fill-page-mode'."
+  "Turn on the `fill-page-mode'."
   (fill-page-mode 1))
 
 ;;;###autoload
@@ -91,14 +91,6 @@
   "Return the last display line number."
   (save-excursion (move-to-window-line -1) (line-number-at-pos nil t)))
 
-(defun fill-page--window-height ()
-  "`line-spacing'-aware calculation of `window-height'."
-  (if (and (fboundp 'window-pixel-height)
-           (fboundp 'line-pixel-height)
-           (display-graphic-p))
-      (/ (window-pixel-height) (line-pixel-height))
-    (window-height)))
-
 ;;; Core
 
 ;;;###autoload
@@ -108,11 +100,10 @@ Return nil, if there are unnecessary lines showing at the end of buffer.
 
 The optional argument BUFFER-OR-NAME must be a string or buffer.  Or else
 will use the current buffer instead."
-  (unless buffer-or-name (setq buffer-or-name (current-buffer)))
-  (with-current-buffer buffer-or-name
-    (let* ((available-lines (1- (fill-page--window-height)))
+  (with-current-buffer (or buffer-or-name (current-buffer))
+    (let* ((available-lines (1- (window-body-height)))
            (full-lines (save-excursion (1+ (move-to-window-line -1)))))
-      (= 0 (- available-lines full-lines)))))
+      (<= (- available-lines full-lines) 0))))
 
 ;;;###autoload
 (defun fill-page (&optional buffer-or-name)
@@ -120,16 +111,14 @@ will use the current buffer instead."
 
 The optional argument BUFFER-OR-NAME must be a string or buffer.  Or else
 will use the current buffer instead."
-  (unless buffer-or-name (setq buffer-or-name (current-buffer)))
-  (with-current-buffer buffer-or-name
+  (with-current-buffer (or buffer-or-name (current-buffer))
     (save-excursion
       (goto-char (point-max))
       (recenter -1))))
 
 (defun fill-page--update-max-line (&optional max-ln)
   "Update MAX-LN."
-  (unless max-ln (setq max-ln (line-number-at-pos (point-max) t)))
-  (setq fill-page--max-line max-ln))
+  (setq fill-page--max-line (or max-ln (line-number-at-pos (point-max) t))))
 
 ;;;###autoload
 (defun fill-page-if-unfill ()
@@ -138,13 +127,13 @@ will use the current buffer instead."
 
 (defun fill-page--do-fill-page (&rest _)
   "Do the fill page once."
-  (let ((win-lst (get-buffer-window-list)))
-    (when (and (window-live-p (selected-window)) win-lst)
-      (fill-page--update-max-line)
-      (save-selected-window
-        (dolist (win win-lst)
-          (select-window win)
-          (fill-page-if-unfill))))))
+  (when-let ((fill-page-mode)
+             (win-lst (get-buffer-window-list))
+             ((window-live-p (selected-window))))
+    (fill-page--update-max-line)
+    (dolist (win win-lst)
+      (with-selected-window win
+        (fill-page-if-unfill)))))
 
 ;;; Registry
 
