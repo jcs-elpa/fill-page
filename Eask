@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "fill-page"
          "0.3.7"
          "Fill buffer so you don't see empty lines at the end")
