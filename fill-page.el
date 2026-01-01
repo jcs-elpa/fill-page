@@ -1,6 +1,6 @@
 ;;; fill-page.el --- Fill buffer so you don't see empty lines at the end  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020-2025  Shen, Jen-Chieh
+;; Copyright (C) 2020-2026  Shen, Jen-Chieh
 ;; Created date 2020-08-16 18:37:21
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
